@@ -5,7 +5,7 @@ import Featured from "components/Featured";
 const FilmCard = ({ film }) => {
   return (
     <div className="ui card">
-      <Featured film={film} />
+      <Featured item={film} />
 
       <div className="image">
         <span className="ui green label ribbon">$ {film.price} </span>

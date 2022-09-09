@@ -1,19 +1,26 @@
+import { useContext } from "react";
 import PropTypes from "prop-types";
+import FilmContext from "contexts/FilmContext";
 
-const Featured = ({ film }) => {
-  const cls = film.featured ? "yellow" : "empty";
+const Featured = ({ item }) => {
+  const { toggleFeatured } = useContext(FilmContext);
+  const cls = item.featured ? "yellow" : "empty";
   return (
-    <span role="status" className="ui right corner label">
+    <span
+      onClick={() => toggleFeatured(item._id)}
+      role="status"
+      className="ui right corner label"
+    >
       <i className={`star icon ${cls}`}></i>
     </span>
   );
 };
 
 Featured.propTypes = {
-  film: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
 };
 Featured.defaltProps = {
-  film: {},
+  item: {},
 };
 
 export default Featured;
