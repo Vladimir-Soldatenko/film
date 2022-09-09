@@ -3,6 +3,7 @@ import { prop, sortWith, ascend, descend } from "ramda";
 import FilmsList from "pages/FilmsPage/components/FilmsList";
 import { items } from "data";
 import FilmContext from "contexts/FilmContext";
+import FilmForm from "pages/FilmsPage/components/FilmForm";
 
 const sortFilms = (films) =>
   sortWith([descend(prop("featured")), ascend(prop("title"))], films);
@@ -26,7 +27,8 @@ const App = () => {
   return (
     <div className="ui container mt-3">
       <FilmContext.Provider value={value}>
-        <FilmsList films={films} />
+        <FilmForm />
+        {/* <FilmsList films={films} /> */}
       </FilmContext.Provider>
     </div>
   );

@@ -51,4 +51,4 @@ FilmCard.defaultProps = {
   film: {},
 };
 
-export default FilmCard;
+export default React.memo(FilmCard);
