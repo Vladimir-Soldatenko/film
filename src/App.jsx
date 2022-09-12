@@ -22,6 +22,10 @@ const App = () => {
     );
   };
 
+  // const deleteFilm = (id) => {
+  //   setFilms(films => films.filter(item => item._id !== id))
+  // }
+
   const value = { toggleFeatured };
   return (
     <div className="ui container mt-3">
