@@ -1,169 +1,111 @@
 import { useState } from "react";
-
-const initialData = {
-  title: "",
-  img: "",
-  description: "",
-  director: "",
-  duration: "",
-  price: "",
-  featured: false,
-};
+import { genres, tags as tagsList } from "data";
+import { T } from "ramda";
 
 const FilmForm = () => {
-  const [data, setData] = useState(initialData);
+  const [tags, setTags] = useState([]);
+  const [genre, setGenre] = useState("");
+  const [sel, setSel] = useState("");
+  const [multiSel, setMultiSel] = useState([]);
 
-  const handleStringChange = (e) => {
-    setData((x) => ({ ...x, [e.target.name]: e.target.value }));
-  };
-  const handleCheckboxChange = (e) => {
-    setData((x) => ({ ...x, [e.target.name]: e.target.checked }));
-  };
-
-  const handleNumberChange = (e) => {
-    let value = parseFloat(e.target.value);
-    value = isNaN(value) || value === 0 ? "" : Math.abs(value);
-    setData((x) => ({ ...x, [e.target.name]: value }));
+  const handleTagsChange = (id) => {
+    setTags((x) => (x.includes(id) ? x.filter((v) => v !== id) : [...x, id]));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(data);
+  const handleGenreChange = (genre) => setGenre(genre);
+
+  const handleSelectChange = ({ target }) => {
+    const { value } = target;
+    if (Number(value) === -1) {
+      alert("Choose option");
+      return;
+    }
+    setSel(value);
+  };
+
+  const handleMultiSelect = ({ target }) => {
+    const multipleSelect = [...target.selectedOptions].map((o) => o.value);
+    setMultiSel(multipleSelect);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="ui form">
-      <div className="ui  grid mb-3">
-        {/*  ===================🌹 two column row START */}
-        <div className="two column row">
-          {/*  ===================🌹 left column START */}
-          <div className="ten wide column">
-            {/*  ===================🌹 title START */}
-            <div className="field">
-              <label htmlFor="title">Film title</label>
-              <input
-                value={data.title}
-                onChange={handleStringChange}
-                type="text"
-                name="title"
-                id="title"
-                placeholder="film title"
-              />
-            </div>
-            {/*  title END  🌹 ===================*/}
-
-            {/* img field START */}
-            <div className="field img-grid">
-              <label htmlFor="img">Image</label>
-              <input
-                value={data.img}
-                onChange={handleStringChange}
-                name="img"
-                id="img"
-              />
-
-              <div className="inp-file">
-                <label htmlFor="photo">Photo</label>
-                <input type="file" id="photo" />
+    <form className="ui form">
+      <div className="ui grid">
+        <div className="four wide column">
+          {/*  =========================  tags  ================  */}
+          <div className="grouped fields">
+            <label>Tags</label>
+            {/* Start  tags  ======*/}
+            {tagsList.map((tag) => (
+              <div key={tag._id} className="field">
+                <div className="ui checkbox field">
+                  <input
+                    onChange={() => handleTagsChange(tag._id)}
+                    checked={tags.includes(tag._id)}
+                    type="checkbox"
+                    id={`tag-${tag._id}`}
+                  />
+                  <label htmlFor={`tag-${tag._id}`}>{tag.title}</label>
+                </div>
               </div>
-            </div>
-            {/* img field END */}
-            {/* description START */}
-            <div className="column row field">
-              <label htmlFor="description">Film description</label>
-              <textarea
-                value={data.description}
-                onChange={handleStringChange}
-                name="description"
-                id="description"
-                placeholder="film description"
-              ></textarea>
-            </div>
-            {/* description END */}
-          </div>
-          {/* left column END 🌹 =================== */}
+            ))}
 
-          {/* img box START */}
-          <div className="six wide column">
-            <img
-              src="https://via.placeholder.com/250x250"
-              className="ui image imgfit"
-              alt="myimg"
-            />
+            {/* ====== finish tags */}
           </div>
-          {/* img box END */}
         </div>
-        {/*   two column row END 🌹=================== */}
-        {/* three columns START */}
-        <div className="three column row mb-3">
-          {/* director START */}
-          <div className="column field">
-            <label htmlFor="director">Director</label>
-            <input
-              value={data.director}
-              onChange={handleStringChange}
-              type="text"
-              name="director"
-              id="director"
-              placeholder="film director"
-            />
+        {/*  ==============================   genre ================  */}
+        <div className="four wide column">
+          <div className="grouped fields">
+            <label>Genres</label>
+            {/* Start genres ====== */}
+            {genres.map((g) => (
+              <div key={g._id} className="ui radio checkbox field">
+                <input
+                  onChange={() => handleGenreChange(g._id)}
+                  checked={genre === g._id}
+                  id={`genre-${g._id}`}
+                  type="radio"
+                  name="example2"
+                />
+                <label htmlFor={`genre-${g._id}`}>{g.title}</label>
+              </div>
+            ))}
+            {/* ====== finish genres  */}
           </div>
-          {/* director END */}
-          {/* duration START */}
-          <div className="column field">
-            <label htmlFor="duration">Duration</label>
-            <input
-              value={data.duration}
-              onChange={handleNumberChange}
-              type="number"
-              name="duration"
-              id="duration"
-              min="10"
-              placeholder="Duration"
-            />
-          </div>
-          {/* duration END */}
-
-          {/* price START */}
-          <div className="column field">
-            <label htmlFor="price">Price</label>
-            <input
-              value={data.price}
-              onChange={handleNumberChange}
-              type="number"
-              min="1"
-              step="0.2"
-              name="price"
-              id="price"
-              placeholder="price"
-            />
-          </div>
-          {/* price END */}
         </div>
-        {/* three columns END */}
-        {/* feature START */}
-        <div className="six wide column inline field">
-          <label htmlFor="featured">Featured</label>
-          <input
-            checked={data.featured}
-            onChange={handleCheckboxChange}
-            type="checkbox"
-            name="featured"
-            id="featured"
-          />
+        {/*  ==============================   sel ================  */}
+        <div className="four wide column">
+          <select
+            value={sel}
+            onChange={handleSelectChange}
+            className="ui dropdown"
+          >
+            <option value="-1">Choose</option>
+            {genres.map((g) => (
+              <option key={g._id} value={g._id}>
+                {g.title}
+              </option>
+            ))}
+          </select>
         </div>
-        {/* feature END */}
-        {/* ===================🌹  Buttons START */}
-        <div className="ui fluid buttons">
-          <button className="ui button primary" type="submit">
-            Save
-          </button>
-          <div className="or"></div>
-          <span className="ui button">Hide form</span>
+        {/*  ==============================  multipleSelect ================  */}
+        <div className="four wide column">
+          <select
+            value={multiSel}
+            onChange={handleMultiSelect}
+            multiple
+            size={genres.length}
+          >
+            {genres.map((g) => (
+              <option value={g._id} key={g._id}>
+                {g.title}
+              </option>
+            ))}
+          </select>
         </div>
-        {/* Buttons END 🌹=================== */}
       </div>
-      {/* ===================🌹  grid END */}
+
+      {/* ====================================================== */}
     </form>
   );
 };
