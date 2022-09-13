@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import PropTypes from "prop-types";
+import ImageLoader from "components/ImageLoader";
+import FormMessage from "components/FormMessage";
 
 const initialData = {
   title: "",
@@ -10,11 +13,23 @@ const initialData = {
   featured: false,
 };
 
-const FilmForm = () => {
+const FilmForm = ({ hideForm, saveFilm }) => {
   const [data, setData] = useState(initialData);
+  const [errors, setErrors] = useState({});
+  const photoRef = useRef();
+
+  const updatePhoto = (e) => {
+    const file = photoRef.current.files && photoRef.current.files[0];
+    if (file) {
+      const img = "/img/" + file.name;
+      setData((x) => ({ ...x, img }));
+    }
+    setErrors((x) => ({ ...x, img: "" }));
+  };
 
   const handleStringChange = (e) => {
     setData((x) => ({ ...x, [e.target.name]: e.target.value }));
+    setErrors((x) => ({ ...x, [e.target.name]: "" }));
   };
   const handleCheckboxChange = (e) => {
     setData((x) => ({ ...x, [e.target.name]: e.target.checked }));
@@ -24,11 +39,31 @@ const FilmForm = () => {
     let value = parseFloat(e.target.value);
     value = isNaN(value) || value === 0 ? "" : Math.abs(value);
     setData((x) => ({ ...x, [e.target.name]: value }));
+    setErrors((x) => ({ ...x, [e.target.name]: "" }));
+  };
+
+  const validate = (data) => {
+    const errors = {};
+    if (!data.title) errors.title = "Title cannot be blank";
+    if (!data.img) errors.img = "img cannot be blank";
+    if (!data.description) errors.description = "description cannot be blank";
+    if (!data.director) errors.director = "Director cannot be blank";
+    if (!data.price) errors.price = "price cannot be blank";
+    if (!data.duration) errors.duration = "duration cannot be blank";
+    if (!data.title) errors.title = "Title cannot be blank";
+    if (parseInt(data.price) <= 0) errors.price = "Error price";
+    return errors;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(data);
+    const errors = validate(data);
+    setErrors(errors);
+    if (Object.keys(errors).length === 0) {
+      saveFilm(data);
+      setData(initialData);
+      setErrors({});
+    }
   };
 
   return (
@@ -39,7 +74,7 @@ const FilmForm = () => {
           {/*  ===================🌹 left column START */}
           <div className="ten wide column">
             {/*  ===================🌹 title START */}
-            <div className="field">
+            <div className={`field column ${errors.title ? "error" : ""}`}>
               <label htmlFor="title">Film title</label>
               <input
                 value={data.title}
@@ -49,11 +84,12 @@ const FilmForm = () => {
                 id="title"
                 placeholder="film title"
               />
+              {errors.title && <FormMessage>{errors.title}</FormMessage>}
             </div>
             {/*  title END  🌹 ===================*/}
 
             {/* img field START */}
-            <div className="field img-grid">
+            <div className={`field img-grid ${errors.img ? "error" : ""}`}>
               <label htmlFor="img">Image</label>
               <input
                 value={data.img}
@@ -61,15 +97,26 @@ const FilmForm = () => {
                 name="img"
                 id="img"
               />
+              {errors.img && <FormMessage>{errors.img}</FormMessage>}
 
               <div className="inp-file">
                 <label htmlFor="photo">Photo</label>
-                <input type="file" id="photo" />
+                <input
+                  ref={photoRef}
+                  onChange={updatePhoto}
+                  type="file"
+                  id="photo"
+                />
               </div>
             </div>
             {/* img field END */}
             {/* description START */}
-            <div className="column row field">
+
+            <div
+              className={`column row field ${
+                errors.description ? "error" : ""
+              }`}
+            >
               <label htmlFor="description">Film description</label>
               <textarea
                 value={data.description}
@@ -78,6 +125,9 @@ const FilmForm = () => {
                 id="description"
                 placeholder="film description"
               ></textarea>
+              {errors.description && (
+                <FormMessage>{errors.description}</FormMessage>
+              )}
             </div>
             {/* description END */}
           </div>
@@ -85,10 +135,11 @@ const FilmForm = () => {
 
           {/* img box START */}
           <div className="six wide column">
-            <img
-              src="https://via.placeholder.com/250x250"
+            <ImageLoader
+              src={data.img}
+              fallbackImg="https://via.placeholder.com/250x250"
+              alt={data.title}
               className="ui image imgfit"
-              alt="myimg"
             />
           </div>
           {/* img box END */}
@@ -97,7 +148,8 @@ const FilmForm = () => {
         {/* three columns START */}
         <div className="three column row mb-3">
           {/* director START */}
-          <div className="column field">
+
+          <div className={`column field ${errors.director ? "error" : ""}`}>
             <label htmlFor="director">Director</label>
             <input
               value={data.director}
@@ -107,10 +159,11 @@ const FilmForm = () => {
               id="director"
               placeholder="film director"
             />
+            {errors.director && <FormMessage>{errors.director}</FormMessage>}
           </div>
           {/* director END */}
           {/* duration START */}
-          <div className="column field">
+          <div className={`column field ${errors.duration ? "error" : ""}`}>
             <label htmlFor="duration">Duration</label>
             <input
               value={data.duration}
@@ -121,11 +174,12 @@ const FilmForm = () => {
               min="10"
               placeholder="Duration"
             />
+            {errors.duration && <FormMessage>{errors.duration}</FormMessage>}
           </div>
           {/* duration END */}
 
           {/* price START */}
-          <div className="column field">
+          <div className={`column field ${errors.price ? "error" : ""}`}>
             <label htmlFor="price">Price</label>
             <input
               value={data.price}
@@ -137,6 +191,7 @@ const FilmForm = () => {
               id="price"
               placeholder="price"
             />
+            {errors.price && <FormMessage>{errors.price}</FormMessage>}
           </div>
           {/* price END */}
         </div>
@@ -159,7 +214,9 @@ const FilmForm = () => {
             Save
           </button>
           <div className="or"></div>
-          <span className="ui button">Hide form</span>
+          <span onClick={hideForm} className="ui button">
+            Hide form
+          </span>
         </div>
         {/* Buttons END 🌹=================== */}
       </div>
@@ -168,4 +225,8 @@ const FilmForm = () => {
   );
 };
 
+FilmForm.propTypes = {
+  hideForm: PropTypes.func.isRequired,
+  saveFilm: PropTypes.func.isRequired,
+};
 export default FilmForm;
