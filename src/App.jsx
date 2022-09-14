@@ -6,6 +6,8 @@ import { items } from "data";
 import FilmContext from "contexts/FilmContext";
 import FilmForm from "pages/FilmsPage/components/FilmForm";
 import TopNavigation from "components/TopNavigation";
+import SignUpForm from "pages/SignupPage/components/SignupForm";
+import LoginForm from "pages/LoginPage/components/LoginForm";
 
 const sortFilms = (films) =>
   sortWith([descend(prop("featured")), ascend(prop("title"))], films);
@@ -47,8 +49,17 @@ const App = () => {
     <div className="ui container mt-3">
       <FilmContext.Provider value={value}>
         <TopNavigation showForm={showForm} />
-
-        <div class="ui stackable grid">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gridGap: "3rem",
+          }}
+        >
+          <LoginForm />
+          <SignUpForm />
+        </div>
+        {/* <div class="ui stackable grid">
           {showAddForm && (
             <div className="six wide column">
               <FilmForm
@@ -62,7 +73,7 @@ const App = () => {
           <div className={`${cols} wide column`}>
             <FilmsList films={films} />
           </div>
-        </div>
+        </div> */}
       </FilmContext.Provider>
     </div>
   );
