@@ -47,6 +47,10 @@ const App = () => {
 
   const saveFilm = (film) => (film._id ? updateFilm(film) : addFilm(film));
 
+  const deleteFilm = (film) => {
+    setFilms((x) => sortFilms(x.filter((f) => f._id !== film._id)));
+  };
+
   const selectedFilmForEdit = (selectedFilm) => {
     setSelectedFilm(selectedFilm);
     setShowAddForm(true);
@@ -54,7 +58,8 @@ const App = () => {
 
   const cols = showAddForm ? "ten" : "sixteen";
 
-  const value = { toggleFeatured, selectedFilmForEdit };
+  const value = { toggleFeatured, selectedFilmForEdit, deleteFilm };
+
   return (
     <div className="ui container mt-3">
       <FilmContext.Provider value={value}>
