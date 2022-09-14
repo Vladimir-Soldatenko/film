@@ -4,6 +4,7 @@ import ImageLoader from "components/ImageLoader";
 import FormMessage from "components/FormMessage";
 
 const initialData = {
+  _id: null,
   title: "",
   img: "",
   description: "",
@@ -13,10 +14,17 @@ const initialData = {
   featured: false,
 };
 
-const FilmForm = ({ hideForm, saveFilm }) => {
+const FilmForm = ({ hideForm, saveFilm, film }) => {
   const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
   const photoRef = useRef();
+
+  if (film._id && film._id !== data._id) {
+    setData(film);
+  }
+  if (!film._id && data._id) {
+    setData(initialData);
+  }
 
   const updatePhoto = (e) => {
     const file = photoRef.current.files && photoRef.current.files[0];

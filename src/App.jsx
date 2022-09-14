@@ -27,17 +27,29 @@ const App = () => {
     );
   };
 
-  const showForm = (e) => setShowAddForm(true);
-  const hideForm = (e) => setShowAddForm(false);
-
-  const saveFilm = (film) => {
-    setFilms((x) => sortFilms([...x, { ...film, _id: id() }]));
-    setShowAddForm(false);
+  const showForm = (e) => {
+    setShowAddForm(true);
+    setSelectedFilm({});
   };
+  const hideForm = (e) => {
+    setShowAddForm(false);
+    setSelectedFilm({});
+  };
+
+  const addFilm = (film) => {
+    setFilms((x) => sortFilms([...x, { ...film, _id: id() }]));
+    hideForm();
+  };
+  const updateFilm = (film) => {
+    setFilms((x) => sortFilms(x.map((f) => (f._id === film._id ? film : f))));
+    hideForm();
+  };
+
+  const saveFilm = (film) => (film._id ? updateFilm(film) : addFilm(film));
 
   const selectedFilmForEdit = (selectedFilm) => {
     setSelectedFilm(selectedFilm);
-    showAddForm(true);
+    setShowAddForm(true);
   };
 
   const cols = showAddForm ? "ten" : "sixteen";
@@ -48,7 +60,7 @@ const App = () => {
       <FilmContext.Provider value={value}>
         <TopNavigation showForm={showForm} />
 
-        <div class="ui stackable grid">
+        <div className="ui stackable grid">
           {showAddForm && (
             <div className="six wide column">
               <FilmForm
