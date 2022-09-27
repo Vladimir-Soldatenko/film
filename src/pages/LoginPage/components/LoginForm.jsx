@@ -1,49 +1,56 @@
-import React from "react";
-import { useState } from "react";
+import { Component } from "react";
+import { Link } from "react-router-dom";
 import FormMessage from "components/FormMessage";
 
-const initData = {
+const initialData = {
   email: "",
   password: "",
 };
 
-const LoginForm = () => {
-  const [loginData, setLoginData] = useState(initData);
-  const [errors, setErrors] = useState({});
-
-  const handleStringChange = (e) => {
-    setLoginData((x) => ({ ...x, [e.target.name]: e.target.value }));
-    setErrors((x) => ({ ...x, [e.target.name]: "" }));
+class LoginForm extends Component {
+  state = {
+    data: initialData,
+    errors: {},
+    loading: false,
   };
+  handleChange = (e) =>
+    this.setState({
+      data: { ...this.state.data, [e.target.name]: e.target.value },
+      errors: { ...this.state.errors, [e.target.name]: "" },
+    });
 
-  const validate = (data) => {
-    const err = {};
-    if (!data.email) err.email = `Email can't be blank`;
-    if (!data.password) err.password = `Password can't be blank`;
-    return err;
-  };
+  validate(data) {
+    const errors = {};
+    if (!data.email) errors.email = "Email cannot be blank";
+    if (!data.password) errors.password = "Password cannot be blank";
 
-  const handleSubmitForm = (e) => {
+    return errors;
+  }
+
+  handleSubmit = (e) => {
     e.preventDefault();
-    const err = validate(loginData);
-    setErrors(err);
-    if (Object.keys(err).length === 0) {
-      setErrors({});
-      setLoginData(initData);
-      console.log(loginData);
+    const errors = this.validate(this.state.data);
+    this.setState({ errors });
+    if (Object.keys(errors).length === 0) {
+      this.setState({ loading: true });
+      this.props
+        .submit(this.state.data)
+        .catch((error) =>
+          this.setState({ errors: error.response.data.errors, loading: false })
+        );
     }
   };
 
-  return (
-    <form className="ui form" onSubmit={handleSubmitForm}>
-      <h2>Login form</h2>
-      <div className="ten wide column">
-        <div className={`field column ${errors.email ? "error" : ""}`}>
-          {/* <div className={`field column `}> */}
-          <label htmlFor="email">Email</label>
+  render() {
+    const { data, errors, loading } = this.state;
+    const cls = loading ? "ui form loading" : "ui form";
+    return (
+      <form  aria-label="login-form" className={cls} onSubmit={this.handleSubmit}>
+        <div className={errors.email ? "error field" : "field"}>
+          <label>Email</label>
           <input
-            value={loginData.email}
-            onChange={handleStringChange}
+            value={data.email}
+            onChange={this.handleChange}
             type="text"
             name="email"
             id="email"
@@ -51,31 +58,31 @@ const LoginForm = () => {
           />
           {errors.email && <FormMessage>{errors.email}</FormMessage>}
         </div>
-        <div className={`field column ${errors.password ? "error" : ""}`}>
-          {/* <div className={`field column `}> */}
-          <label htmlFor="password">Password</label>
+
+        <div className={errors.password ? "error field" : "field"}>
+          <label>Password</label>
           <input
-            value={loginData.password}
-            onChange={handleStringChange}
-            type="text"
+            value={data.password}
+            onChange={this.handleChange}
+            type="password"
             name="password"
             id="password"
-            placeholder="Password"
+            placeholder="password"
           />
           {errors.password && <FormMessage>{errors.password}</FormMessage>}
         </div>
-        {/* ===================🌹  Buttons START */}
         <div className="ui fluid buttons">
-          <button className="ui button primary" type="submit">
-            Login
-          </button>
-          <div className="or"></div>
-          <span className="ui button">Cancel</span>
+          <button className="ui button primary">Login</button>
+
+          <div className="or" />
+
+          <Link to="/" className="ui button">
+            Cancel
+          </Link>
         </div>
-        {/* Buttons END 🌹=================== */}
-      </div>
-    </form>
-  );
-};
+      </form>
+    );
+  }
+}
 
 export default LoginForm;

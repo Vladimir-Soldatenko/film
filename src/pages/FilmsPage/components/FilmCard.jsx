@@ -1,9 +1,21 @@
-import React from "react";
+import * as React from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import Featured from "components/Featured";
 import FilmCardButtons from "./FilmCardButtons";
+import { useIsAuth } from "contexts/UserContext";
 
 const FilmCard = ({ film }) => {
+  const { isAdmin, isUser } = useIsAuth();
+
+  const actionUser = (
+    <div className="extra content">
+      <Link to={`/film/${film._id}`} className="header">
+        <span className="ui green basic button">Read more</span>
+      </Link>
+    </div>
+  );
+
   return (
     <div className="ui card">
       <Featured item={film} />
@@ -14,7 +26,15 @@ const FilmCard = ({ film }) => {
       </div>
 
       <div className="content">
-        <span className="header">{film.title}</span>
+        <p className="header">
+          {isAdmin ? (
+            <Link to={`/film/${film._id}`} className="header">
+              {film.title}
+            </Link>
+          ) : (
+            film.title
+          )}
+        </p>
         <div className="meta">
           <i className="icon users"></i> {film.director}
           <span className="right floated">
@@ -22,7 +42,8 @@ const FilmCard = ({ film }) => {
           </span>
         </div>
       </div>
-      <FilmCardButtons film={film} />
+      {isAdmin && <FilmCardButtons film={film} />}
+      {isUser && actionUser}
     </div>
   );
 };

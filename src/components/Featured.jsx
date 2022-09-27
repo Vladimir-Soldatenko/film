@@ -11,7 +11,7 @@ const Featured = ({ item }) => {
       role="status"
       className="ui right corner label"
     >
-      <i className={`star icon ${cls}`}></i>
+      <i role="img" className={`star icon ${cls}`}></i>
     </span>
   );
 };

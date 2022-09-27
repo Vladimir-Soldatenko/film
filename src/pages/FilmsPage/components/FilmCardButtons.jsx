@@ -36,7 +36,7 @@ const FilmCardButtons = ({ film }) => {
   );
 
   const buttons = (
-    <div className="ui two buttons">
+    <div role="button" aria-label="admin-buttons" className="ui two buttons">
       <SelectButton film={film} />
       <span onClick={showConfirm} className="ui red basic button">
         <i className="ui icon trash"></i>

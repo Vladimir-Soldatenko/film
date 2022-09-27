@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import _find from "lodash/find";
 import PropTypes from "prop-types";
 import FormMessage from "components/FormMessage";
 import UploadImage from "components/UploadImage";
+import { useIsAuth } from "contexts/UserContext";
 
 const initialData = {
   _id: null,
@@ -23,6 +24,14 @@ const FilmForm = ({ saveFilm, films }) => {
 
   const navigate = useNavigate();
   const { _id } = useParams();
+
+  const { isAdmin } = useIsAuth();
+
+  useEffect(() => {
+    if (!isAdmin) {
+      navigate("/films");
+    }
+  }, [isAdmin, navigate]);
 
   const film = _find(films, { _id }) || {};
 

@@ -1,105 +1,108 @@
-import React from "react";
+import { Component } from "react";
+import { Link } from "react-router-dom";
+import isEmail from "validator/es/lib/isEmail";
+import equals from "validator/es/lib/equals";
 import FormMessage from "components/FormMessage";
-import { useState } from "react";
 
-const initData = {
+const initialData = {
   email: "",
   password: "",
-  password_confirm: "",
+  passwordConfirmation: "",
 };
 
-const SignUpForm = () => {
-  const [data, setData] = useState(initData);
-  const [errors, setErrors] = useState({});
-
-  const handleStringChange = (e) => {
-    setData((x) => ({ ...x, [e.target.name]: e.target.value }));
-    setErrors((x) => ({ ...x, [e.target.name]: "" }));
+class SignupForm extends Component {
+  state = {
+    data: initialData,
+    errors: {},
+    loading: false,
   };
+  handleChange = (e) =>
+    this.setState({
+      data: { ...this.state.data, [e.target.name]: e.target.value },
+      errors: { ...this.state.errors, [e.target.name]: "" },
+    });
 
-  const validate = (data) => {
-    const err = {};
-    if (!data.email) err.email = `Email can't be blank`;
-    if (!data.password) err.password = `Password can't be blank`;
-    if (!data.password_confirm)
-      err.password_confirm = `Password confirm can't be blank`;
-    if (data.password_confirm !== data.password)
-      err.password_confirm = `Passwords must match, please try again`;
-    return err;
-  };
+  validate(data) {
+    const errors = {};
+    if (!isEmail(data.email)) errors.email = "Wrong format email";
+    if (!data.password) errors.password = "Password cannot be blank";
+    if (!data.passwordConfirmation)
+      errors.passwordConfirmation = "Password confirmation cannot be blank";
+    if (!equals(data.password, data.passwordConfirmation))
+      errors.passwordConfirmation = "Passwords is not equals";
+    return errors;
+  }
 
-  const handleSubmit = (e) => {
+  handleSubmit = (e) => {
     e.preventDefault();
-    const err = validate(data);
-    setErrors(err);
-    if (Object.keys(err).length === 0) {
-      setErrors({});
-      setData(initData);
-      console.log(data)
+    const errors = this.validate(this.state.data);
+    this.setState({ errors });
+    if (Object.keys(errors).length === 0) {
+      this.setState({ loading: true });
+      this.props
+        .submit(this.state.data)
+        .catch((error) =>
+          this.setState({ errors: error.response.data.errors, loading: false })
+        );
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="ui form">
-      <h2>SignUp Form</h2>
-      {/* ================== email ======================= */}
-      <div>
-        <div className={`field column ${errors.email ? "error" : ""}`}>
+  render() {
+    const { data, errors, loading } = this.state;
+    const cls = loading ? "ui form loading" : "ui form";
+    return (
+      <form  aria-label="signup-form" className={cls} onSubmit={this.handleSubmit}>
+        <div className={errors.email ? "error field" : "field"}>
           <label htmlFor="email">Email</label>
           <input
             value={data.email}
-            onChange={handleStringChange}
+            onChange={this.handleChange}
             type="text"
             name="email"
             id="email"
-            placeholder="Email..."
+            placeholder="Email"
           />
           {errors.email && <FormMessage>{errors.email}</FormMessage>}
         </div>
-        {/* ================== password ======================= */}
 
-        <div className={`field column ${errors.password ? "error" : ""}`}>
+        <div className={errors.password ? "error field" : "field"}>
           <label htmlFor="password">Password</label>
           <input
             value={data.password}
-            onChange={handleStringChange}
+            onChange={this.handleChange}
             type="text"
             name="password"
             id="password"
-            placeholder="Password..."
+            placeholder="password"
           />
           {errors.password && <FormMessage>{errors.password}</FormMessage>}
         </div>
-        {/* ================== password_confirm ======================= */}
 
-        <div
-          className={`field column ${errors.password_confirm ? "error" : ""}`}
-        >
-          <label htmlFor="password_confirm">Password Confirmation</label>
+        <div className={errors.passwordConfirmation ? "error field" : "field"}>
+          <label htmlFor="passwordConfirmation">Password Confirmation</label>
           <input
-            value={data.password_confirm}
-            onChange={handleStringChange}
+            value={data.passwordConfirmation}
+            onChange={this.handleChange}
             type="text"
-            name="password_confirm"
-            id="password_confirm"
-            placeholder="Password confirmation..."
+            name="passwordConfirmation"
+            id="passwordConfirmation"
+            placeholder="password confirmation"
           />
-          {errors.password_confirm && (
-            <FormMessage>{errors.password_confirm}</FormMessage>
+          {errors.passwordConfirmation && (
+            <FormMessage>{errors.passwordConfirmation}</FormMessage>
           )}
         </div>
-        {/* ===================🌹  Buttons START */}
-        <div className="ui fluid buttons">
-          <button className="ui button primary" type="submit">
-            Login
-          </button>
-          <div className="or"></div>
-          <span className="ui button">Cancel</span>
-        </div>
-        {/* Buttons END 🌹=================== */}
-      </div>
-    </form>
-  );
-};
 
-export default SignUpForm;
+        <div className="ui fluid buttons">
+          <button className="ui button primary">Sing Up</button>
+          <div className="or" />
+          <Link to="/" className="ui button">
+            Cancel
+          </Link>
+        </div>
+      </form>
+    );
+  }
+}
+
+export default SignupForm;
