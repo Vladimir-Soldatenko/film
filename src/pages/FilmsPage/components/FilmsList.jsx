@@ -1,3 +1,4 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 import FilmCard from "pages/FilmsPage/components/FilmCard";
 import Message from "components/Message";
@@ -24,4 +25,4 @@ FilmsList.defaultProsp = {
   films: [],
 };
 
-export default FilmsList;
+export default memo(FilmsList);

@@ -1,9 +1,12 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import _find from "lodash/find";
 import PropTypes from "prop-types";
-import ImageLoader from "components/ImageLoader";
 import FormMessage from "components/FormMessage";
+import UploadImage from "components/UploadImage";
 
 const initialData = {
+  _id: null,
   title: "",
   img: "",
   description: "",
@@ -13,17 +16,25 @@ const initialData = {
   featured: false,
 };
 
-const FilmForm = ({ hideForm, saveFilm }) => {
+const FilmForm = ({ saveFilm, films }) => {
   const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
-  const photoRef = useRef();
+  const [loading, setLoading] = useState(false);
 
-  const updatePhoto = (e) => {
-    const file = photoRef.current.files && photoRef.current.files[0];
-    if (file) {
-      const img = "/img/" + file.name;
-      setData((x) => ({ ...x, img }));
-    }
+  const navigate = useNavigate();
+  const { _id } = useParams();
+
+  const film = _find(films, { _id }) || {};
+
+  if (film._id && film._id !== data._id) {
+    setData(film);
+  }
+  if (!film._id && data._id) {
+    setData(initialData);
+  }
+
+  const updatePhoto = (img) => {
+    setData((x) => ({ ...x, img }));
     setErrors((x) => ({ ...x, img: "" }));
   };
 
@@ -60,14 +71,26 @@ const FilmForm = ({ hideForm, saveFilm }) => {
     const errors = validate(data);
     setErrors(errors);
     if (Object.keys(errors).length === 0) {
-      saveFilm(data);
+      setLoading(true);
+      saveFilm(data)
+        .then(() => {
+          navigate("/films");
+        })
+        .catch((err) => {
+          setErrors(err.response.data.errors);
+          setLoading(false);
+        });
       setData(initialData);
       setErrors({});
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="ui form">
+    <form
+      onSubmit={handleSubmit}
+      aria-label="film-form"
+      className={`ui form ${loading && "loading"}`}
+    >
       <div className="ui  grid mb-3">
         {/*  ===================🌹 two column row START */}
         <div className="two column row">
@@ -98,16 +121,6 @@ const FilmForm = ({ hideForm, saveFilm }) => {
                 id="img"
               />
               {errors.img && <FormMessage>{errors.img}</FormMessage>}
-
-              <div className="inp-file">
-                <label htmlFor="photo">Photo</label>
-                <input
-                  ref={photoRef}
-                  onChange={updatePhoto}
-                  type="file"
-                  id="photo"
-                />
-              </div>
             </div>
             {/* img field END */}
             {/* description START */}
@@ -135,12 +148,7 @@ const FilmForm = ({ hideForm, saveFilm }) => {
 
           {/* img box START */}
           <div className="six wide column">
-            <ImageLoader
-              src={data.img}
-              fallbackImg="https://via.placeholder.com/250x250"
-              alt={data.title}
-              className="ui image imgfit"
-            />
+            <UploadImage img={data.img} updatePhoto={updatePhoto} />
           </div>
           {/* img box END */}
         </div>
@@ -214,9 +222,9 @@ const FilmForm = ({ hideForm, saveFilm }) => {
             Save
           </button>
           <div className="or"></div>
-          <span onClick={hideForm} className="ui button">
+          <Link to="/films" className="ui button">
             Hide form
-          </span>
+          </Link>
         </div>
         {/* Buttons END 🌹=================== */}
       </div>
@@ -226,7 +234,6 @@ const FilmForm = ({ hideForm, saveFilm }) => {
 };
 
 FilmForm.propTypes = {
-  hideForm: PropTypes.func.isRequired,
   saveFilm: PropTypes.func.isRequired,
 };
 export default FilmForm;
