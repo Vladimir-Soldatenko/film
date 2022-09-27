@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import FilmContext from "contexts/FilmContext";
+import { useDeleteFilm } from "contexts/FilmContext";
 
 const SelectButton = ({ film }) => {
   return (
@@ -12,7 +12,7 @@ const SelectButton = ({ film }) => {
 };
 
 const DeleteButton = ({ film }) => {
-  const { deleteFilm } = useContext(FilmContext);
+  const deleteFilm = useDeleteFilm();
   return (
     <span onClick={() => deleteFilm(film)} className="ui red basic button">
       <i className="ui icon check" /> YES

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { NavLink, Navigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useIsAuth, useLogout } from "contexts/UserContext";
 
 const TopNavigation = () => {

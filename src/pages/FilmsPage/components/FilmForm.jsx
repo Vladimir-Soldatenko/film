@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import _find from "lodash/find";
-import PropTypes from "prop-types";
 import FormMessage from "components/FormMessage";
 import UploadImage from "components/UploadImage";
 import { useIsAuth } from "contexts/UserContext";
+import { useStateFilms, useSaveFilm } from "contexts/FilmContext";
 
 const initialData = {
   _id: null,
@@ -17,10 +17,13 @@ const initialData = {
   featured: false,
 };
 
-const FilmForm = ({ saveFilm, films }) => {
+const FilmForm = () => {
   const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const films = useStateFilms();
+  const saveFilm = useSaveFilm();
 
   const navigate = useNavigate();
   const { _id } = useParams();
@@ -242,7 +245,4 @@ const FilmForm = ({ saveFilm, films }) => {
   );
 };
 
-FilmForm.propTypes = {
-  saveFilm: PropTypes.func.isRequired,
-};
 export default FilmForm;

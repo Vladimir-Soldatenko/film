@@ -1,9 +1,8 @@
-import { useContext } from "react";
 import PropTypes from "prop-types";
-import FilmContext from "contexts/FilmContext";
+import { useToggleFeatured } from "contexts/FilmContext";
 
 const Featured = ({ item }) => {
-  const { toggleFeatured } = useContext(FilmContext);
+  const toggleFeatured = useToggleFeatured();
   const cls = item.featured ? "yellow" : "empty";
   return (
     <span
