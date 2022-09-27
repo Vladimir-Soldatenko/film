@@ -1,18 +1,12 @@
-import { useEffect } from "react";
 import { useParams, Navigate } from "react-router-dom";
-import useAsync from "hooks/useAsync";
-import api from "api";
 import { FullSpinner } from "styles/app";
 import { useIsAuth } from "contexts/UserContext";
+import { useFetchFilm } from "hooks/films";
 
 const FilmDetails = () => {
-  const { data: film, isLoading, isError, isSuccess, run } = useAsync();
   const { id } = useParams();
+  const { data: film, isLoading, isError, isSuccess } = useFetchFilm(id);
   const { isAuth } = useIsAuth();
-
-  useEffect(() => {
-    run(api.films.fetchById(id));
-  }, [id, run]);
 
   return (
     <>

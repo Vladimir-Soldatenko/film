@@ -5,7 +5,7 @@ import {
 } from "@testing-library/react";
 import { server, rest } from "test/server";
 import FilmsPage from "pages/FilmsPage";
-import { AppProviders } from "contexts";
+import { renderWithClient } from "test/reactQueryWrapper";
 
 jest.mock("contexts/UserContext", () => ({
   ...jest.requireActual("contexts/UserContext"),
@@ -13,7 +13,8 @@ jest.mock("contexts/UserContext", () => ({
 }));
 
 test("should render admin buttons", async () => {
-  render(<FilmsPage />, { wrapper: AppProviders });
+  renderWithClient(<FilmsPage />);
+
   await waitForElementToBeRemoved(() => screen.queryByLabelText(/loading/i));
   const adminButtons = await screen.findByRole("button", {
     name: /admin-buttons/i,
@@ -27,7 +28,8 @@ test("should render spinner", async () => {
       return res(ctx.json({ films: [] }));
     })
   );
-  render(<FilmsPage />, { wrapper: AppProviders });
+  renderWithClient(<FilmsPage />);
+
   await waitForElementToBeRemoved(() => screen.queryByLabelText(/loading/i));
   expect(screen.getByLabelText("message")).toBeInTheDocument();
 });

@@ -1,40 +1,34 @@
-import { screen, render } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { AppProviders } from "contexts";
 import Featured from "components/Featured";
+import { renderWithClient } from "test/reactQueryWrapper";
 
 const propsData = { item: { _id: "1", featured: true } };
-const toggleFeatured = jest.fn();
 
-const mockToggleFeatured = jest.fn();
-jest.mock("contexts/FilmContext", () => ({
-  ...jest.requireActual("contexts/FilmContext"),
-  useToggleFeatured: () => mockToggleFeatured,
+const mockMutate = jest.fn();
+jest.mock("hooks/films", () => ({
+  useToggledFeatured: () => ({ mutate: mockMutate }),
 }));
 
-const RenderComponent = (props) => {
-  return (
-    <AppProviders>
-      <Featured {...props} />
-    </AppProviders>
-  );
-};
-
 test("should corrent render", async () => {
-  const { rerender } = render(<RenderComponent {...propsData} />);
+  const { rerender } = renderWithClient(<Featured {...propsData} />);
   const spanEl = screen.getByRole("status");
   const iconEl = screen.getByRole("img");
 
   expect(iconEl).toHaveClass("yellow");
 
   await userEvent.click(spanEl);
-
-  await expect(mockToggleFeatured).toHaveBeenCalledTimes(1);
-  await expect(mockToggleFeatured).toHaveBeenCalledWith("1");
+  await expect(mockMutate).toHaveBeenCalledTimes(1);
+  await expect(mockMutate).toHaveBeenCalledWith({ _id: "1", featured: false });
 
   propsData.item.featured = false;
 
-  rerender(<RenderComponent {...propsData} />);
+  rerender(<Featured {...propsData} />);
+
+  await userEvent.click(spanEl);
   expect(iconEl).toHaveClass("empty");
   expect(iconEl).not.toHaveClass("yellow");
+
+  await expect(mockMutate).toHaveBeenCalledTimes(2);
+  await expect(mockMutate).toHaveBeenCalledWith({ _id: "1", featured: true });
 });
